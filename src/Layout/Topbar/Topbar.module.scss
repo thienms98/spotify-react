@@ -1,0 +1,34 @@
+.wrapper{
+  width: 100%;
+  height: 4em;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 1em;
+  align-items: center;
+  position: fixed;
+  padding: 0 32px;
+  z-index: 10;
+
+  &.sticky{
+  
+  }
+}
+
+.background{
+  background-color: #181818;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s;
+
+  &.half{
+    opacity: .5;
+  }
+  &.full{
+    opacity: 1;
+  }
+}

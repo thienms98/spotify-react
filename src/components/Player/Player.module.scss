@@ -1,0 +1,40 @@
+.wrapper{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+
+  &>input{
+    padding: 0.375em 3em; 
+    width: 364px;
+    font-size: 1em;
+    box-sizing: content-box;
+    border-width: 1px;
+    border-color: #000;
+    border-radius: 1.25em;
+  }
+}
+
+.btns{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1em;
+
+  .item{
+    padding: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+
+    &.disabled{
+      color: #888;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.time-range{
+  display: flex;
+  flex-direction: row;
+}

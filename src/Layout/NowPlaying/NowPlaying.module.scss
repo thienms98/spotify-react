@@ -1,0 +1,117 @@
+.wrapper{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 5em;
+  padding: 0 1em;
+  box-sizing: border-box;
+  background-color: #181818;
+  border: 1px solid #282828;
+  position: relative;
+}
+
+.detail{
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+
+  .image{
+    width: 3.5em;
+    height: 3.5em;
+    position: relative;
+    cursor: pointer;
+    
+    &>img{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .text{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+
+    .name{
+      font-size: .875em;
+      line-height: 1.25em;
+      color: #fff;
+      cursor: pointer;
+
+      &:hover{
+        text-decoration: underline;
+      }
+    }
+    .artists{
+      font-size: 0.6875em;
+      color: rgb(179, 179, 179);
+      line-height: 1.125em;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+
+      &>.item{
+        white-space: nowrap;
+
+        &:not(:first-child)::before{
+          content: ',';
+          padding-left: 2px;
+        }
+
+        &:hover{
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  .btns{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .btn{
+      padding: 0.5em;
+      border-radius: 50%;
+      border: 1px solid transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color:  rgb(179, 179, 179);
+      cursor: pointer;
+      
+      &:hover{
+        animation: pulse .3s forwards;
+      }
+
+    }
+  }
+}
+
+
+@keyframes pulse{
+  0%{
+    box-shadow: 0 0 4px 0 #1ed760 inset,
+    0 0 8px 0 #1ed760 inset,
+    0 0 16px 0 #1ed760 inset;
+  }
+  90%{
+    box-shadow: 0 0 1px 0 #1ed760 inset,
+    0 0 2px 0 #1ed760 inset,
+    0 0 4px 0 #1ed760 inset;
+  }
+  100%{
+    box-shadow: none;
+    color: #1ed760;
+  }
+}

@@ -1,0 +1,39 @@
+.wrapper{
+  display: flex;
+  flex-direction: row;
+  height: 2.5em;
+  position: relative;
+  overflow: hidden;
+
+  &>input{
+    padding: 0.375em 3em; 
+    width: 364px;
+    font-size: 1em;
+    box-sizing: content-box;
+    border-width: 1px;
+    border-color: #000;
+    border-radius: 1.25em;
+  }
+}
+
+.icon{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3em;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #000;
+  cursor: pointer;
+
+  &:last-child{
+    left: 100%;
+    transform: translateX(-100%);
+  }
+
+  &>svg{
+    font-size: 1.5em;
+  }
+}
