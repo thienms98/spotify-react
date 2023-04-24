@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import { createQueueBySingle, setPlaylistAsQueue } from 'src/redux/reducers/queue';
+import { createQueueBySingle, setAlbumURI } from 'src/redux/reducers/queue';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
@@ -30,8 +30,6 @@ interface Artist {
 // };
 
 export default function Card({ data }: { data: any }) {
-  console.log(data);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -47,10 +45,10 @@ export default function Card({ data }: { data: any }) {
 
   switch (type) {
     case 'track':
-      cardData.image = { url: '' };
-      cardData.artists = data.artists.map((item: any) => {
-        return { uri: item.uri, name: item.name };
-      });
+      // cardData.image = data.albumOfTrack.coverArt.sources.at(0);
+      // cardData.artists = data.artists.items.map((item: any) => {
+      //   return { uri: item.uri, name: item.profile.name };
+      // });
       break;
     case 'album':
       cardData.image = data.coverArt.sources.at(-1);
@@ -76,8 +74,6 @@ export default function Card({ data }: { data: any }) {
       break;
     case 'show':
       cardData.text = data.publisher.name;
-      break;
-    case 'podcast':
       cardData.image = data.coverArt.sources.at(-1);
       break;
 
@@ -107,8 +103,8 @@ export default function Card({ data }: { data: any }) {
         <div
           className={cx('play-btn')}
           onClick={() => {
-            if (cardData.uri.split(':')[1] === 'playlist') {
-              dispatch(setPlaylistAsQueue(cardData.uri));
+            if (cardData.uri.split(':')[1] === 'album') {
+              dispatch(setAlbumURI(cardData.uri));
             } else dispatch(createQueueBySingle(data));
           }}
         >

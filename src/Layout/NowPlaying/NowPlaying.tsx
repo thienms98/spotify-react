@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faList } from '@fortawesome/free-solid-svg-icons';
 import { Player } from 'src/components/Player';
 import { RangeSlider } from 'src/components/RangeSlider';
+import { RootState } from 'src/redux/store';
 
 import classNames from 'classnames/bind';
 import styles from './NowPlaying.module.scss';
@@ -120,6 +122,10 @@ const track = {
 };
 
 export default function NowPlaying() {
+  const queue = useSelector((state: RootState) => state.queue);
+  console.log(queue);
+  // const track = queue.list[queue.currentIndex];
+
   // fetch('https://accounts.spotify.com/api/token', {
   //   method: 'POST',
   //   headers: {
@@ -142,7 +148,7 @@ export default function NowPlaying() {
         <div className={cx('text')}>
           <div className={cx('name')}>{track.name}</div>
           <div className={cx('artists')}>
-            {track.artists.map((artist) => {
+            {track.artists.map((artist: any) => {
               return (
                 <span className={cx('item')} key={artist.id}>
                   <Link to={`/artist/${artist.id}`}>{artist.name}</Link>
@@ -161,6 +167,9 @@ export default function NowPlaying() {
         <Player volume={volume} />
       </div>
       <div className={cx('more')}>
+        <Link to={'/queue'}>
+          <FontAwesomeIcon icon={faList} />
+        </Link>
         <RangeSlider current={volume} max={100} changeHandler={adjustVolume} />
       </div>
     </div>

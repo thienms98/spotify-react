@@ -1,27 +1,35 @@
+import { Link } from 'react-router-dom';
+
 import { Card } from 'src/components/Card';
 import { Section } from 'src/components/Section';
+import { Track } from 'src/components/Track';
 import { result } from './result';
 
 import classNames from 'classnames/bind';
 import styles from './Searchpage.module.scss';
-import { keyboardImplementationWrapper } from '@testing-library/user-event/dist/keyboard';
 const cx = classNames.bind(styles);
 
 export default function Searchpage() {
   return (
     <div className={cx('wrapper')}>
-      <section title="Top result">
-        <div className={cx('title')}>Top result</div>
-        {result.topResults.items.map(({ data }) => {
-          return (
-            <div className={cx('item')} key={data.id}>
-              {data.name}
-            </div>
-          );
+      <Section title="Top result" expandable={false}>
+        {/* <Card data={result.topResults.items.at(0)?.data} /> */}
+      </Section>
+      <Section title="Songs" expandable={false}>
+        {[...result.tracks.items].splice(0, 4).map(({ data }) => {
+          const track = {
+            uri: data.uri,
+            artists: data.artists.items,
+            name: data.name,
+            duration: data.duration,
+            image: data.albumOfTrack.coverArt.sources.at(0) || { width: 0, height: 0, url: '' },
+            album: null,
+          };
+          return <Track data={track} key={data.id} playHandle={() => {}} />;
         })}
-      </section>
+      </Section>
 
-      {/* <Section title='Featured'>
+      <Section title="Featured" expandable={result.artists.items.length > 6}>
         {result.topResults.featured.map(({ data }) => {
           return (
             <div className={cx('item')} key={data.uri}>
@@ -29,17 +37,9 @@ export default function Searchpage() {
             </div>
           );
         })}
-      {/* </Section> */}
-      {/* {Object.keys(result).map((key: string) => {
-        const {items}= result[key]
-        return <Section title={key} expandable={result[key].items.length > 6>
-          {items.map(({data}) => {
-            return <Card key={data.uri.split(':')[2]} data={data} />;
-          }</div>)}
-        </Section>
-      })} */}
+      </Section>
 
-      {/* <Section title="Artists" expandable={result.artists.items.length > 6}>
+      <Section title="Artists" expandable={result.artists.items.length > 6}>
         {result.artists.items.map(({ data }) => {
           return <Card key={data.uri.split(':')[2]} data={data} />;
         })}
@@ -49,7 +49,7 @@ export default function Searchpage() {
         {result.albums.items.map(({ data }) => {
           return <Card key={data.uri.split(':')[2]} data={data} />;
         })}
-      </Section> */}
+      </Section>
 
       <Section title="Playlists" expandable={result.playlists.items.length > 6}>
         {result.playlists.items.map(({ data }) => {
