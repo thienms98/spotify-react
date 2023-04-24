@@ -20,7 +20,7 @@ export default function Queue() {
             return { uri: art.uri, profile: { name: art.name } };
           }),
           duration: { totalMilliseconds: track.duration_ms },
-          image: { url: '', width: 0, height: 0 },
+          image: track.image || { url: '', width: 0, height: 0 },
           name: track.name,
           album: null,
         };

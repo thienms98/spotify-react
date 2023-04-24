@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from 'src/redux/store';
+import { updateIndex } from 'src/redux/reducers/queue';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faForwardStep, faBackwardStep } from '@fortawesome/free-solid-svg-icons';
@@ -18,7 +19,7 @@ declare global {
   }
 }
 
-export default function Player({ volume }: { volume: number }) {
+export default function Player() {
   const album = {
     album_group: 'album',
     album_type: 'album',
@@ -433,24 +434,26 @@ export default function Player({ volume }: { volume: number }) {
     uri: 'spotify:album:2ZYIby6irhfnCE3uQDBCi0',
   };
   const queue = useSelector((state: RootState) => state.queue);
+  const player = useSelector((state: RootState) => state.player);
+  const dispatch = useDispatch();
 
   const audioRef = useRef<HTMLAudioElement>(new Audio());
-  const [playlist, setPlaylist] = useState<any[]>(() => {
-    return album.tracks.items;
-  });
-  const [currentSong, setCurrentSong] = useState<number>(0);
+  // const [playlist, setPlaylist] = useState<any[]>(() => {
+  //   return album.tracks.items;
+  // });
+  // const [currentSong, setCurrentSong] = useState<number>(0);
   const [playing, setPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
 
   useEffect(() => {
-    setCurrentSong(0);
-    setPlaylist(queue.list);
-  }, [queue]);
+    dispatch(updateIndex(0));
+    // setPlaylist(queue.list);
+  }, [queue.list]);
 
   useEffect(() => {
     audioRef.current.play();
     setPlaying(true);
-  }, [playlist, currentSong]);
+  }, [queue.list, queue.currentIndex]);
 
   useEffect(() => {
     if (playing) {
@@ -467,8 +470,8 @@ export default function Player({ volume }: { volume: number }) {
   }, [playing, currentTime]);
 
   useEffect(() => {
-    audioRef.current.volume = volume / 100;
-  }, [volume]);
+    audioRef.current.volume = player.volume / 100;
+  }, [player.volume]);
 
   const updateCurrentTime = (time: number) => {
     setCurrentTime(time);
@@ -488,24 +491,28 @@ export default function Player({ volume }: { volume: number }) {
   //   };
   // }, []);
 
+  console.log(queue.currentIndex);
+
   return (
     <div className={cx('wrapper')}>
       {/* <div id="embed-iframe"></div> */}
 
       <audio
-        src={playlist[currentSong]?.preview_url}
+        src={queue.list[queue.currentIndex]?.preview_url}
         ref={audioRef}
         onEnded={() => {
           audioRef.current.pause();
           setPlaying(false);
-          setCurrentSong((cur) => (cur + 1 < playlist.length ? cur + 1 : cur));
+          if (queue.currentIndex + 1 < queue.list.length - 1) dispatch(updateIndex(queue.currentIndex + 1));
         }}
       ></audio>
 
       <div className={cx('btns')}>
         <div
-          className={cx('item', { disabled: currentSong <= 0 })}
-          onClick={() => setCurrentSong((cur) => (cur - 1 > 0 ? cur - 1 : cur))}
+          className={cx('item', { disabled: queue.currentIndex <= 0 })}
+          onClick={() => {
+            if (queue.currentIndex - 1 > 0) dispatch(updateIndex(queue.currentIndex - 1));
+          }}
         >
           <FontAwesomeIcon icon={faBackwardStep} />
         </div>
@@ -515,8 +522,10 @@ export default function Player({ volume }: { volume: number }) {
         </div>
 
         <div
-          className={cx('item', { disabled: currentSong >= playlist.length - 1 })}
-          onClick={() => setCurrentSong((cur) => (cur + 1 < playlist.length - 1 ? cur + 1 : cur))}
+          className={cx('item', { disabled: queue.currentIndex >= queue.list.length - 1 })}
+          onClick={() => {
+            if (queue.currentIndex + 1 < queue.list.length - 1) dispatch(updateIndex(queue.currentIndex + 1));
+          }}
         >
           <FontAwesomeIcon icon={faForwardStep} />
         </div>
