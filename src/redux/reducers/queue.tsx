@@ -31,14 +31,16 @@ export const queueSlice = createSlice({
     },
 
     // get playlist's uri then replace playlist with queue
-    setAlbumURI(state, action: PayloadAction<string>) {
+    setURI(state, action: PayloadAction<string>) {
       state.uri = action.payload;
     },
+
+    // update list after get data from uri
     setPlaylist(state, action: PayloadAction<[]>) {
       state.list = action.payload;
     },
   },
 });
 
-export const { createQueueBySingle, addSingleToQueue, setAlbumURI, setPlaylist, updateIndex } = queueSlice.actions;
+export const { createQueueBySingle, addSingleToQueue, setURI, setPlaylist, updateIndex } = queueSlice.actions;
 export default queueSlice.reducer;

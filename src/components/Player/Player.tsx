@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from 'src/redux/store';
 import { updateIndex } from 'src/redux/reducers/queue';
+import { playStateChange } from 'src/redux/reducers/player';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faForwardStep, faBackwardStep } from '@fortawesome/free-solid-svg-icons';
@@ -435,14 +436,11 @@ export default function Player() {
   };
   const queue = useSelector((state: RootState) => state.queue);
   const player = useSelector((state: RootState) => state.player);
+  const isPlaying = player.playState;
   const dispatch = useDispatch();
 
   const audioRef = useRef<HTMLAudioElement>(new Audio());
-  // const [playlist, setPlaylist] = useState<any[]>(() => {
-  //   return album.tracks.items;
-  // });
-  // const [currentSong, setCurrentSong] = useState<number>(0);
-  const [playing, setPlaying] = useState<boolean>(false);
+  // const [playing, setPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
 
   useEffect(() => {
@@ -452,14 +450,14 @@ export default function Player() {
 
   useEffect(() => {
     audioRef.current.play();
-    setPlaying(true);
+    dispatch(playStateChange(true));
   }, [queue.list, queue.currentIndex]);
 
   useEffect(() => {
-    if (playing) {
+    if (isPlaying) {
       audioRef.current.play();
     } else audioRef.current.pause();
-  }, [playing]);
+  }, [isPlaying]);
 
   useEffect(() => {
     let getTime: ReturnType<typeof setTimeout> = setTimeout(() => {
@@ -467,7 +465,7 @@ export default function Player() {
     }, 500);
 
     return () => clearTimeout(getTime);
-  }, [playing, currentTime]);
+  }, [isPlaying, currentTime]);
 
   useEffect(() => {
     audioRef.current.volume = player.volume / 100;
@@ -491,8 +489,6 @@ export default function Player() {
   //   };
   // }, []);
 
-  console.log(queue.currentIndex);
-
   return (
     <div className={cx('wrapper')}>
       {/* <div id="embed-iframe"></div> */}
@@ -502,7 +498,7 @@ export default function Player() {
         ref={audioRef}
         onEnded={() => {
           audioRef.current.pause();
-          setPlaying(false);
+          dispatch(playStateChange(false));
           if (queue.currentIndex + 1 < queue.list.length - 1) dispatch(updateIndex(queue.currentIndex + 1));
         }}
       ></audio>
@@ -517,8 +513,8 @@ export default function Player() {
           <FontAwesomeIcon icon={faBackwardStep} />
         </div>
 
-        <div className={cx('item')} onClick={() => setPlaying((prev) => !prev)}>
-          <FontAwesomeIcon icon={playing ? faPause : faPlay} />
+        <div className={cx('item')} onClick={() => dispatch(playStateChange(!isPlaying))}>
+          <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} />
         </div>
 
         <div

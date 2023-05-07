@@ -4,7 +4,7 @@ const cx = classNames.bind(styles);
 
 export default function Section({
   title,
-  expandable = false,
+  expandable,
   children,
 }: {
   title: string;
@@ -12,7 +12,7 @@ export default function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section>
+    <section className={cx('section')}>
       <div className={cx('head')}>
         <div className={cx('title')}>
           <span>{title}</span>
@@ -23,3 +23,7 @@ export default function Section({
     </section>
   );
 }
+
+Section.defaultProps = {
+  expandable: false,
+};

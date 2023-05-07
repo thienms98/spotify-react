@@ -1,7 +1,6 @@
 .wrapper{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 2.5em 2.5em 2fr 1.5fr .5fr;
   width: 100%;
   padding: 0.5em;
 
@@ -10,14 +9,27 @@
     .play-btn{
       opacity: 1;
     }
+    .icon{
+      opacity: 1;
+    }
   }
+
+  &.short{
+    grid-template-columns: 0 2.5em 2fr 1.5fr .5fr;
+  }
+}
+
+.index{
+  padding: 0 1em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .image{
   width: 40px;
   height: 40px;
   position: relative;
-  margin-right: 1em;
 
   &>img{
     width: 100%;
@@ -41,19 +53,27 @@
       // font-size: 1.25em;
     }
 
-    
+    .shown{
+      opacity: 1;
+    }    
   }
 }
 .text{
   flex: 1;
+  padding-left: 1em;
 
   .artist>a:not(:first-child)::before{
     content: ', ';
   }
 }
+.album{
+  display: flex;
+  align-items: center;
+}
 .more{
   display: flex;
   flex-direction: row;
+  align-items: center;
   gap: 1em;
 
   .fav{
@@ -61,5 +81,7 @@
   }
   .icon{
     cursor: pointer;
+    opacity: 0;
   }
+  
 }

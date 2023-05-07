@@ -1,11 +1,13 @@
-section{
+.section{
   display: grid;
   grid-template-rows: 3.5em auto;
   grid-template-columns: repeat(6, 1fr);
+  gap: 1em;
+  width: 100%;
 
   .head{
     grid-row: 1/1;
-    grid-column: 1/7;
+    grid-column: 1/-1;
     display: flex;
 
     .title{
@@ -20,5 +22,22 @@ section{
       font-size: .875;
       color: #b3b3b3
     }
+  }
+}
+
+@media (max-width: 1400px){
+  .section{
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+@media (max-width: 1024px){
+  .section{
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px){
+  .section{
+    grid-template-columns: repeat(3, 1fr);
   }
 }

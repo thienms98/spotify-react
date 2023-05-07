@@ -6,7 +6,7 @@ import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import linkFromURI from 'src/utils/linkFromURI';
 
 import classNames from 'classnames/bind';
-import styles from './Card.module.scss';
+import styles from './TopResult.module.scss';
 const cx = classNames.bind(styles);
 
 interface CardData {
@@ -17,19 +17,8 @@ interface CardData {
   text: string;
   artists: string[] | null;
 }
-interface Artist {
-  uri: string;
-  name: string;
-}
-// const card = {
-//   id: '37i9dQZF1DXdR77H5Z8MIM',
-//   image: { url: 'https://i.scdn.co/image/ab67706f000000026dbe8ae0cb131e4a3ab86dd8' },
-//   uri: 'spotify:playlist:37i9dQZF1DXdR77H5Z8MIM',
-//   name: 'Nolja!',
-//   text: "Time to press play on these jaem jams from 2010 onwards! Cover: BE'O",
-// };
 
-export default function Card({ data }: { data: any }) {
+export default function TopResult({ data }: { data: any }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -45,10 +34,10 @@ export default function Card({ data }: { data: any }) {
 
   switch (type) {
     case 'track':
-      // cardData.image = data.albumOfTrack.coverArt.sources.at(0);
-      // cardData.artists = data.artists.items.map((item: any) => {
-      //   return { uri: item.uri, name: item.profile.name };
-      // });
+      cardData.image = data.albumOfTrack.coverArt?.sources.at(0);
+      cardData.artists = data.artists.items.map((item: any) => {
+        return { uri: item.uri, name: item.profile.name };
+      });
       break;
     case 'album':
       cardData.image = data.coverArt.sources.at(-1);
@@ -63,12 +52,12 @@ export default function Card({ data }: { data: any }) {
       break;
 
     case 'artist':
-      cardData.text = 'Artist';
-      cardData.image = data.visuals.avatarImage?.sources.at(0);
+      cardData.text = '';
+      cardData.image = data.visuals.avatarImage?.sources?.at(0);
       cardData.name = data.profile.name;
       break;
     case 'user':
-      cardData.text = 'Profile';
+      cardData.text = '';
       cardData.image = { url: data.image.largeImageUrl };
       cardData.name = data.displayName;
       break;
@@ -86,37 +75,24 @@ export default function Card({ data }: { data: any }) {
         'min';
       break;
     default:
-      cardData.text = 'By ' + data.owner.name;
+      cardData.text = data.owner.name;
 
       break;
   }
 
   return (
     <div className={cx('wrapper')}>
-      <div className={cx('head')}>
-        <div
-          className={cx('image', { rounded: cardData.uri.split(':')[1] === 'artist' })}
-          onClick={() => navigate(linkFromURI(cardData.uri))}
-        >
-          <img src={cardData.image?.url} alt={cardData.name} />
-        </div>
-        <div
-          className={cx('play-btn')}
-          onClick={() => {
-            const type = cardData.uri.split(':')[1];
-            if (type === 'album' || type === 'playlist' || type === 'artist') {
-              dispatch(setURI(cardData.uri));
-            } else dispatch(createQueueBySingle(data));
-          }}
-        >
-          <FontAwesomeIcon icon={faPlay} />
-        </div>
+      <div
+        className={cx('image', { rounded: cardData.uri.split(':')[1] === 'artist' })}
+        onClick={() => navigate(linkFromURI(cardData.uri))}
+      >
+        <img src={cardData.image?.url} alt={cardData.name} />
       </div>
-      <div className={cx('body')} onClick={() => navigate(linkFromURI(cardData.uri))}>
-        <div className={cx('name')} title={cardData.name}>
-          <Link to={linkFromURI(cardData.uri)}>{cardData.name}</Link>
-        </div>
-        <div className={cx('text')} title={cardData.text}>
+      <div className={cx('name')} title={cardData.name}>
+        <Link to={linkFromURI(cardData.uri)}>{cardData.name}</Link>
+      </div>
+      <div className={cx('text')}>
+        <div className={cx('artist')} title={cardData.text}>
           {cardData.text ||
             cardData.artists?.map((artist: any) => {
               return (
@@ -126,16 +102,19 @@ export default function Card({ data }: { data: any }) {
               );
             })}
         </div>
+        <div className={cx('type')}>{type}</div>
+      </div>
+      <div
+        className={cx('play-btn')}
+        onClick={() => {
+          const type = cardData.uri.split(':')[1];
+          if (['album', 'artist', 'playlist'].includes(type)) {
+            dispatch(setURI(cardData.uri));
+          } else dispatch(createQueueBySingle(data));
+        }}
+      >
+        <FontAwesomeIcon icon={faPlay} />
       </div>
     </div>
   );
 }
-
-Card.defaultProps = {
-  uri: '',
-  id: '',
-  image: { url: '' },
-  name: '',
-  text: '',
-  artists: null,
-};

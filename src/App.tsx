@@ -6,10 +6,11 @@ import { setPlaylist } from 'src/redux/reducers/queue';
 import { Routes, Route } from 'react-router-dom';
 import { Sidebar, Topbar, NowPlaying } from 'src/Layout';
 import { Search } from 'src/components/Search';
-import { Homepage, Searchpage, Queue } from './pages';
+import { Homepage, Searchpage, Queue, Track, Playlist } from './pages';
 
 import 'normalize.css';
 import 'src/App.css';
+import { isConstructorDeclaration } from 'typescript';
 
 interface RequestOptions {
   method: string;
@@ -34,19 +35,56 @@ function App() {
   const [, type, id] = useMemo(() => queue.uri.split(':'), [queue.uri]);
 
   useEffect(() => {
-    if (type === 'album') {
-      fetch(`${baseUrl}/albums/?ids=${id}`, options)
-        .then((res) => res.json())
-        .then((res) => {
-          console.log(res);
-          dispatch(
-            setPlaylist(
-              res.albums[0].tracks.items.map((item: {}) => {
-                return { ...item, image: { ...res.albums[0].images[0] } };
-              }),
-            ),
-          );
-        });
+    switch (type) {
+      case 'album':
+        fetch(`${baseUrl}/albums/?ids=${id}`, options)
+          .then((res) => res.json())
+          .then((res) => {
+            console.log(res);
+            dispatch(
+              setPlaylist(
+                res.albums[0].tracks.items.map((item: {}) => {
+                  return { ...item, image: { ...res.albums[0].images[0] } };
+                }),
+              ),
+            );
+          });
+        break;
+
+      case 'playlist':
+        fetch(`${baseUrl}/playlist_tracks/?id=${id}&offset=0&limit=100`, options)
+          .then((res) => res.json())
+          .then((res) => {
+            dispatch(
+              setPlaylist(
+                res.items.map((item: { track: {}; video_thumbnail: {} }) => {
+                  return { ...item, ...item.track, image: item.video_thumbnail };
+                }),
+              ),
+            );
+          });
+        break;
+
+      case 'artist':
+        fetch(`${baseUrl}/artist_overview/?id=${id}`, options)
+          .then((res) => res.json())
+          .then((res) => {
+            console.log(res);
+            dispatch(
+              setPlaylist(
+                res.data.artist.discography.topTracks.items.map((item: any) => {
+                  return {
+                    ...item.track,
+                    artists: item.track.artists.items,
+                    image: item.track.album.coverArt.sources[0],
+                  };
+                }),
+              ),
+            );
+          });
+        break;
+      default:
+        break;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, id]);
@@ -63,8 +101,10 @@ function App() {
       <div className="main-view">
         <Routes>
           <Route path="/" element={<Homepage />}></Route>
-          <Route path="/search" element={<Searchpage />}></Route>
+          <Route path="/search/:query" element={<Searchpage />}></Route>
           <Route path="/queue" element={<Queue />}></Route>
+          <Route path="/track/:trackId" element={<Track />}></Route>
+          <Route path="/playlist/:playlistId" element={<Playlist />}></Route>
         </Routes>
       </div>
     </div>

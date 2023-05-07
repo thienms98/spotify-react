@@ -1,7 +1,10 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faHeart, faEllipsis } from '@fortawesome/free-solid-svg-icons';
+import { useSelector } from 'react-redux';
+import { RootState } from 'src/redux/store';
 import { Link } from 'react-router-dom';
+
 import { linkFromURI, timeFormater } from 'src/utils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay, faPause, faHeart, faEllipsis } from '@fortawesome/free-solid-svg-icons';
 
 import classNames from 'classnames/bind';
 import styles from './Track.module.scss';
@@ -13,17 +16,27 @@ interface TrackData {
   name: string;
   duration: { totalMilliseconds: number };
   image: { url: string; width: number; height: number };
-  album: {} | null;
+  album: {
+    name: string;
+    uri: string;
+  } | null;
 }
 
-interface TrackProps {
+export default function Track({
+  index = 0,
+  data,
+  playHandle,
+}: {
+  index: number;
   data: TrackData;
   playHandle: Function;
-}
+}) {
+  const queue = useSelector((state: RootState) => state.queue);
+  const { playState } = useSelector((state: RootState) => state.player);
 
-export default function Track({ data, playHandle }: TrackProps) {
   return (
-    <div className={cx('wrapper')} key={data.uri.split(':')[2]}>
+    <div className={cx('wrapper', { short: index === 0 })} key={data.uri.split(':')[2]}>
+      <div className={cx('index')}>{index !== 0 && index}</div>
       <div
         className={cx('image')}
         title={`Play ${data.name} by ${
@@ -36,8 +49,13 @@ export default function Track({ data, playHandle }: TrackProps) {
         }`}
       >
         <img src={data.image.url} alt="" />
-        <div className={cx('play-btn')} onClick={() => playHandle()}>
-          <FontAwesomeIcon icon={faPlay} />
+        <div
+          className={cx('play-btn', {
+            shown: data.uri === queue.list[queue.currentIndex]?.uri,
+          })}
+          onClick={() => playHandle()}
+        >
+          <FontAwesomeIcon icon={data.uri === queue.list[queue.currentIndex]?.uri && playState ? faPause : faPlay} />
         </div>
       </div>
       <div className={cx('text')}>
@@ -54,6 +72,7 @@ export default function Track({ data, playHandle }: TrackProps) {
           })}
         </div>
       </div>
+      <div className={cx('album')}>{data.album && <Link to={linkFromURI(data.album.uri)}>{data.album.name}</Link>}</div>
       <div className={cx('more')}>
         <div className={cx('fav')}>
           <div className={cx('icon')}>
@@ -70,3 +89,7 @@ export default function Track({ data, playHandle }: TrackProps) {
     </div>
   );
 }
+
+Track.defaultProps = {
+  index: 0,
+};

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useDebounce } from 'src/hooks/useDebounce';
@@ -10,8 +10,9 @@ const cx = classNames.bind(styles);
 
 export default function Search() {
   const navigate = useNavigate();
+  const { query } = useParams();
 
-  const [searchText, setSearchText] = useState<string>('');
+  const [searchText, setSearchText] = useState<string>(query || '');
   const debounce = useDebounce(searchText, 500);
   const inputRef = useRef<HTMLInputElement>(null);
 

@@ -25,13 +25,16 @@ export default function Queue() {
           album: null,
         };
         return (
-          <Track
-            data={data}
-            key={track.uri}
-            playHandle={() => {
-              dispatch(updateIndex(index));
-            }}
-          />
+          <div className={cx('track')}>
+            <div className={cx('index')}>{index}</div>
+            <Track
+              data={data}
+              key={track.uri}
+              playHandle={() => {
+                dispatch(updateIndex(index));
+              }}
+            />
+          </div>
         );
       })}
     </div>

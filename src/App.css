@@ -7,6 +7,8 @@
 }
 
 :root{
+  --content-padding: 4em 32px 5em;
+
   --background-base: #121212;
   --background-highlight: #1a1a1a;
   --background-press: #000;
@@ -62,11 +64,12 @@ body{
 }
 .side-bar{
   grid-area: side-bar;
+  width: 230px;
 }
 .main-view{
   grid-area: main-view;
-  padding: 4em 32px 5em;
   height: 100%;
+  min-height: 100vh;
   box-sizing: border-box;
 }
 .now-playing{
@@ -90,4 +93,11 @@ button{
 input{
   outline: none;
   border-style: solid;
+}
+
+*::-webkit-scrollbar{
+  background-color: #121212;
+}
+*::-webkit-scrollbar-thumb{
+  background-color: #ffffff80;
 }

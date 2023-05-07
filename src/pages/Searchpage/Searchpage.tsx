@@ -1,22 +1,93 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 
 import { Card } from 'src/components/Card';
+import { TopResult } from 'src/components/TopResult';
 import { Section } from 'src/components/Section';
 import { Track } from 'src/components/Track';
-import { result } from './result';
+import { result as mockResult } from './result';
 
 import classNames from 'classnames/bind';
 import styles from './Searchpage.module.scss';
 const cx = classNames.bind(styles);
 
 export default function Searchpage() {
+  const [searchResult, setSearchResult] = useState(mockResult);
+  const [filter, setFilter] = useState<string | null>('nulti');
+  const filters = [
+    {
+      title: 'All',
+      value: 'nulti',
+    },
+    {
+      title: 'Songs',
+      value: 'track',
+    },
+    {
+      title: 'Artists',
+      value: 'artist',
+    },
+    {
+      title: 'Albums',
+      value: 'album',
+    },
+    {
+      title: 'Playlists',
+      value: 'playlist',
+    },
+    {
+      title: 'Podcasts & Shows',
+      value: 'show',
+    },
+    {
+      title: 'Profiles',
+      value: 'user',
+    },
+  ];
+  const { query } = useParams();
+
+  const url = `https://spotify23.p.rapidapi.com/search/?q=${query}E&type=${filter}&offset=0&limit=10&numberOfTopResults=5`;
+  const options = {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/octet-stream',
+      'X-RapidAPI-Key': '2c37ff9770msh38de50c5a059b0ep1eedebjsn8c2eea331b8b',
+      'X-RapidAPI-Host': 'spotify23.p.rapidapi.com',
+    },
+  };
+
+  useEffect(() => {
+    fetch(url, options)
+      .then((res) => res.json())
+      .then((res: any) => setSearchResult(res))
+      .then(() => (document.body.scrollTop = 0));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, filter]);
+
   return (
     <div className={cx('wrapper')}>
-      <Section title="Top result" expandable={false}>
-        {/* <Card data={result.topResults.items.at(0)?.data} /> */}
-      </Section>
-      <Section title="Songs" expandable={false}>
-        {[...result.tracks.items].splice(0, 4).map(({ data }) => {
+      <div className={cx('filters')}>
+        {filters.map(({ title, value }) => {
+          return (
+            <div
+              className={cx('item', { selected: filter === value })}
+              key={value}
+              onClick={() => {
+                setFilter(value);
+              }}
+            >
+              {title}
+            </div>
+          );
+        })}
+      </div>
+      <section className={cx('top')}>
+        <div className={cx('label')}>Top result</div>
+        <TopResult data={searchResult.topResults.items[0].data} />
+      </section>
+      <section className={cx('songs')}>
+        <div className={cx('label')}>Songs</div>
+        {[...searchResult.tracks.items].splice(0, 4).map(({ data }) => {
           const track = {
             uri: data.uri,
             artists: data.artists.items,
@@ -27,10 +98,17 @@ export default function Searchpage() {
           };
           return <Track data={track} key={data.id} playHandle={() => {}} />;
         })}
-      </Section>
+      </section>
 
-      <Section title="Featured" expandable={result.artists.items.length > 6}>
-        {result.topResults.featured.map(({ data }) => {
+      <Section title="Featured">
+        {searchResult.topResults.featured.map(({ data }) => {
+          return (
+            <div className={cx('item')} key={data.uri}>
+              <Card data={data} />
+            </div>
+          );
+        })}
+        {[...searchResult.topResults.featured].splice(0, 2).map(({ data }) => {
           return (
             <div className={cx('item')} key={data.uri}>
               <Card data={data} />
@@ -39,39 +117,39 @@ export default function Searchpage() {
         })}
       </Section>
 
-      <Section title="Artists" expandable={result.artists.items.length > 6}>
-        {result.artists.items.map(({ data }) => {
-          return <Card key={data.uri.split(':')[2]} data={data} />;
+      <Section title="Artists">
+        {searchResult.artists.items.map(({ data }) => {
+          return <Card key={data.uri?.split(':')[2]} data={data} />;
         })}
       </Section>
 
-      <Section title="Albums" expandable={result.albums.items.length > 6}>
-        {result.albums.items.map(({ data }) => {
-          return <Card key={data.uri.split(':')[2]} data={data} />;
+      <Section title="Albums">
+        {searchResult.albums.items.map(({ data }) => {
+          return <Card key={data.uri?.split(':')[2]} data={data} />;
         })}
       </Section>
 
-      <Section title="Playlists" expandable={result.playlists.items.length > 6}>
-        {result.playlists.items.map(({ data }) => {
-          return <Card key={data.uri.split(':')[2]} data={data} />;
+      <Section title="Playlists">
+        {searchResult.playlists.items.map(({ data }) => {
+          return <Card key={data.uri?.split(':')[2]} data={data} />;
         })}
       </Section>
 
-      <Section title="Podcasts" expandable={result.podcasts.items.length > 6}>
-        {result.podcasts.items.map(({ data }) => {
-          return <Card key={data.uri.split(':')[2]} data={data} />;
+      <Section title="Podcasts">
+        {searchResult.podcasts.items.map(({ data }) => {
+          return <Card key={data.uri?.split(':')[2]} data={data} />;
         })}
       </Section>
 
-      <Section title="Episodes" expandable={result.episodes.items.length > 6}>
-        {result.episodes.items.map(({ data }) => {
-          return <Card key={data.uri.split(':')[2]} data={data} />;
+      <Section title="Episodes">
+        {searchResult.episodes.items.map(({ data }) => {
+          return <Card key={data.uri?.split(':')[2]} data={data} />;
         })}
       </Section>
 
-      <Section title="Profiles" expandable={result.users.items.length > 6}>
-        {result.users.items.map(({ data }) => {
-          return <Card key={data.uri.split(':')[2]} data={data} />;
+      <Section title="Profiles">
+        {searchResult.users.items.map(({ data }) => {
+          return <Card key={data.uri?.split(':')[2]} data={data} />;
         })}
       </Section>
     </div>

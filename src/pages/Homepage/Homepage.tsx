@@ -1,4 +1,5 @@
 import { Card } from 'src/components/Card';
+import { Section } from 'src/components/Section';
 
 import classNames from 'classnames/bind';
 import styles from './Homepage.module.scss';
@@ -355,9 +356,11 @@ const playlist = [
 export default function Homepage() {
   return (
     <div className={cx('wrapper')}>
-      {playlist.map((track) => {
-        return <Card key={track.id} data={track} />;
-      })}
+      <Section title="Today mix" expandable={true}>
+        {playlist.map((track) => {
+          return <Card key={track.id} data={track} />;
+        })}
+      </Section>
     </div>
   );
 }
