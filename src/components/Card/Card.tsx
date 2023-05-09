@@ -17,17 +17,6 @@ interface CardData {
   text: string;
   artists: string[] | null;
 }
-interface Artist {
-  uri: string;
-  name: string;
-}
-// const card = {
-//   id: '37i9dQZF1DXdR77H5Z8MIM',
-//   image: { url: 'https://i.scdn.co/image/ab67706f000000026dbe8ae0cb131e4a3ab86dd8' },
-//   uri: 'spotify:playlist:37i9dQZF1DXdR77H5Z8MIM',
-//   name: 'Nolja!',
-//   text: "Time to press play on these jaem jams from 2010 onwards! Cover: BE'O",
-// };
 
 export default function Card({ data }: { data: any }) {
   const navigate = useNavigate();
@@ -90,6 +79,8 @@ export default function Card({ data }: { data: any }) {
 
       break;
   }
+  console.log('data: ', data);
+  console.log('cardData: ', cardData);
 
   return (
     <div className={cx('wrapper')}>

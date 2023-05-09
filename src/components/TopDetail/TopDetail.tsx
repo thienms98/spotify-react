@@ -33,18 +33,30 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
 
   const [showOptions, setShowOptions] = useState<boolean>(false);
 
+  let cover, totalTime;
+  console.log(type);
+
   // config data
   if (data)
     switch (type) {
       case 'playlist':
-        var cover = data.images?.at(0);
-        var totalTime = tracks.items.reduce(
+        cover = data.images?.at(0);
+        totalTime = tracks.items.reduce(
           (prev: number, current: { track: { duration_ms: number } }) => prev + current.track.duration_ms,
           0,
         );
         break;
+
       case 'album':
+        cover = data.images?.at(0);
+        console.log(tracks.items);
+        owner = { uri: data.artists[0].uri, display_name: data.artists[0].name };
+        totalTime = tracks.items.reduce(
+          (prev: number, current: { duration_ms: number }) => prev + current.duration_ms,
+          0,
+        );
         break;
+
       default:
         break;
     }

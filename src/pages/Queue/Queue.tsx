@@ -15,13 +15,12 @@ export default function Queue() {
     <div className={cx('wrapper')}>
       {queue.list.map((track, index) => {
         const data = {
-          uri: track.uri,
+          ...track,
           artists: track.artists.map((art: any) => {
             return { uri: art.uri, profile: { name: art.name } };
           }),
           duration: { totalMilliseconds: track.duration_ms },
           image: track.image || { url: '', width: 0, height: 0 },
-          name: track.name,
           album: null,
         };
         return (

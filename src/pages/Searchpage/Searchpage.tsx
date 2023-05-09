@@ -90,6 +90,7 @@ export default function Searchpage() {
         {[...searchResult.tracks.items].splice(0, 4).map(({ data }) => {
           const track = {
             uri: data.uri,
+            explicit: false,
             artists: data.artists.items,
             name: data.name,
             duration: data.duration,

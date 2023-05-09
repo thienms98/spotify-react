@@ -529,7 +529,12 @@ export default function Player() {
 
       <div className={cx('time-range')}>
         {timeFormater(Math.round(currentTime))}
-        <RangeSlider current={currentTime} max={audioRef.current.duration || 0} changeHandler={updateCurrentTime} />
+        <RangeSlider
+          current={currentTime}
+          max={audioRef.current.duration || 0}
+          changeHandler={updateCurrentTime}
+          key={currentTime}
+        />
         {timeFormater(Math.round(audioRef.current.duration || 0))}
       </div>
     </div>

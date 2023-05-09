@@ -6,11 +6,10 @@ import { setPlaylist } from 'src/redux/reducers/queue';
 import { Routes, Route } from 'react-router-dom';
 import { Sidebar, Topbar, NowPlaying } from 'src/Layout';
 import { Search } from 'src/components/Search';
-import { Homepage, Searchpage, Queue, Track, Playlist } from './pages';
+import { Homepage, Searchpage, Queue, Track, Playlist, Album } from './pages';
 
 import 'normalize.css';
 import 'src/App.css';
-import { isConstructorDeclaration } from 'typescript';
 
 interface RequestOptions {
   method: string;
@@ -105,6 +104,7 @@ function App() {
           <Route path="/queue" element={<Queue />}></Route>
           <Route path="/track/:trackId" element={<Track />}></Route>
           <Route path="/playlist/:playlistId" element={<Playlist />}></Route>
+          <Route path="/album/:albumId" element={<Album />}></Route>
         </Routes>
       </div>
     </div>

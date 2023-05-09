@@ -12,6 +12,7 @@ const cx = classNames.bind(styles);
 
 interface TrackData {
   uri: string;
+  explicit: boolean;
   artists: { uri: string; profile: { name: string } }[];
   name: string;
   duration: { totalMilliseconds: number };
@@ -51,7 +52,7 @@ export default function Track({
         <img src={data.image.url} alt="" />
         <div
           className={cx('play-btn', {
-            shown: data.uri === queue.list[queue.currentIndex]?.uri,
+            shown: data.uri === queue.list[queue.currentIndex]?.uri && playState,
           })}
           onClick={() => playHandle()}
         >
@@ -62,14 +63,17 @@ export default function Track({
         <div className={cx('name')}>
           <Link to={linkFromURI(data.uri)}>{data.name}</Link>
         </div>
-        <div className={cx('artist')}>
-          {data.artists.map((art: any) => {
-            return (
-              <Link to={linkFromURI(art.uri)} key={art.uri}>
-                {art.profile.name}
-              </Link>
-            );
-          })}
+        <div className={cx('detail')}>
+          {data.explicit && <span>E</span>}
+          <div className={cx('artist')}>
+            {data.artists.map((art: any) => {
+              return (
+                <Link to={linkFromURI(art.uri)} key={art.uri}>
+                  {art.profile.name}
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </div>
       <div className={cx('album')}>{data.album && <Link to={linkFromURI(data.album.uri)}>{data.album.name}</Link>}</div>

@@ -41,10 +41,11 @@ export default function Playlist() {
       </div>
       {tracks &&
         tracks.items.map((item: any, index: number) => {
-          const { uri, artists, name, duration_ms, album } = item.track;
+          const { uri, artists, name, duration_ms, album, explicit } = item.track;
 
           const data = {
             uri,
+            explicit,
             artists: artists?.map((artist: any) => ({ ...artist, profile: { name: artist.name } })),
             name,
             duration: { totalMilliseconds: duration_ms },
