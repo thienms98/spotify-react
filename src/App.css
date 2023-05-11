@@ -65,6 +65,7 @@ body{
 .side-bar{
   grid-area: side-bar;
   width: 230px;
+  z-index: 8;
 }
 .main-view{
   grid-area: main-view;

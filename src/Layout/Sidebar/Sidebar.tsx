@@ -17,20 +17,24 @@ export default function Sidebar() {
 
   return (
     <div className={cx('wrapper', { enlarge: isEnlarge })}>
-      <Link to={'/'}>
-        <SpotifyLogo />
-      </Link>
-      <br />
-      <Link to={'/search'}>
-        <FontAwesomeIcon icon={faMagnifyingGlass} />
-        Search
-      </Link>
-      <Library
-        isCollapse={isCollapse}
-        isEnlarge={isEnlarge}
-        collapse={() => setIsCollapse((prev) => !prev)}
-        enlarge={() => setIsEnlarge((prev) => !prev)}
-      />
+      <div className={cx('box')}>
+        <Link to={'/'}>
+          <SpotifyLogo />
+        </Link>
+        <br />
+        <Link to={'/search'}>
+          <FontAwesomeIcon icon={faMagnifyingGlass} />
+          Search
+        </Link>
+      </div>
+      <div className={cx('box')}>
+        <Library
+          isCollapse={isCollapse}
+          isEnlarge={isEnlarge}
+          collapse={() => setIsCollapse((prev) => !prev)}
+          enlarge={() => setIsEnlarge((prev) => !prev)}
+        />
+      </div>
     </div>
   );
 }

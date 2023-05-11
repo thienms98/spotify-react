@@ -27,7 +27,7 @@
     }
   }
 
-  .icon{
+  &>.icon{
     width: 1.5em;
     height: 1.5em;
     border-radius: 50%;
@@ -38,6 +38,125 @@
 
     &:hover{
       background-color: rgba(255,255,255,0.2);
+    }
+  }
+}
+
+
+
+.filter{
+  .tags{
+    display: flex;
+    flex-direction: row;
+
+    .tags-item{
+      background-color: rgba(255, 255, 255, 0.098);
+      color: #fff;
+      padding: 0.25rem 0.75rem;
+      border-radius: 2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+
+      &.active{
+        background-color: #fff;
+        color: #000;
+      }
+    }
+  }
+
+  .row{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .search{
+    position: relative;
+    .icon{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: transparent;
+      color: rgba(255, 255, 255, 0.698);
+      width: 2rem;
+      height: 2rem;
+      padding: 0.5rem;
+      position: relative;
+      z-index: 2;
+
+      &:hover{
+        background-color: hsla(0,0%,100%,.1);
+        border-radius: 50%;
+        color: #fff;
+      }
+    }
+    .input{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+
+      &>input{
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none;
+        background-color: transparent;
+        padding-left: 2rem;
+        transition: all .3s;
+        transform: scaleX(0);
+        transform-origin: left;
+        color: #fff;
+        z-index: 1;
+
+        &:focus{
+          background-color: hsla(0,0%,100%,.1);
+          border-radius: 4px;
+          transform: scaleX(1);
+          z-index: 3;
+        }
+      }
+    }
+  }
+
+  .sort{
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .list{
+      position: absolute;
+      top: 100%;
+      left: 0;
+      padding: 4px;
+      background-color: #282828;
+      border-radius: 4px;
+      z-index: 7;
+      transform: scaleY(0);
+
+      .title{
+        white-space: nowrap;
+        padding: .75rem;
+        font-size: .6875rem;
+        color: rgba(255, 255, 255, 0.698)
+      }
+      .list-item{
+        white-space: nowrap;
+        cursor: pointer;
+        padding: .75rem;
+        border-radius: 4px;
+
+        &:hover{
+          background-color: hsla(0,0%,100%,.1)
+        }
+
+        &.selected{
+          color: #1ed760
+        }
+      }
     }
   }
 }

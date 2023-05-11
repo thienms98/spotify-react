@@ -1,3 +1,4 @@
+import { useState, useRef, RefObject, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from 'src/redux/store';
 
@@ -27,6 +28,31 @@ interface LibraryProps {
 
 export default function Library({ isCollapse, isEnlarge, collapse, enlarge }: LibraryProps) {
   const { list } = useSelector((state: RootState) => state.library);
+  const [ctxMenu, setCtxMenu] = useState(-1);
+  const [sort, setSort] = useState('Recents');
+  const searchRef = useRef<HTMLInputElement | null>(null);
+
+  const showContextMenu = (index: number) => {
+    setCtxMenu(index);
+  };
+
+  // useEffect(() => {
+  //   switch (sort) {
+  //     case 'Recents':
+  //       break;
+  //     case 'Recently Added':
+  //       list.sort((a: any, b: any) => a.createdTime - b.createdTime);
+  //       break;
+  //     case 'Alphabetical':
+  //       list.sort((a: any, b: any) => a.name - b.name);
+  //       break;
+  //     case 'Creator':
+  //       list.sort((a: any, b: any) => a.creator.name - b.creator.name);
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }, [sort]);
 
   return (
     <div className={cx('wrapper', { collapse: isCollapse })}>
@@ -58,32 +84,45 @@ export default function Library({ isCollapse, isEnlarge, collapse, enlarge }: Li
           <FontAwesomeIcon icon={isEnlarge ? faArrowLeft : faArrowRight} />
         </div>
       </div>
-      <div className={cx('sort')}>
+      <div className={cx('filter')}>
         <div className={cx('tags')}>
           <div className={cx('close-btn')}></div>
           <div className={cx('tags-item')}>Playlists</div>
           <div className={cx('tags-item')}>By You</div>
           <div className={cx('tags-item')}>Albums</div>
         </div>
-        <div className={cx('')}>
+        <div className={cx('row')}>
           <div className={cx('search')}>
-            <div className={cx('icon')}>
+            <button
+              className={cx('icon')}
+              type="button"
+              title="find"
+              onClick={() => {
+                console.log('clicked');
+                searchRef.current?.focus();
+              }}
+            >
               <FontAwesomeIcon icon={faMagnifyingGlass} />
-            </div>
+            </button>
             <div className={cx('input')}>
-              <input type="text" placeholder="Search In Your Library" />
+              <input type="text" ref={searchRef} placeholder="Search In Your Library" />
             </div>
           </div>
 
           <div className={cx('sort')}>
-            <div className={cx('toggle')}>Recents</div>
+            <div className={cx('toggle')}>{sort}</div>
             <div className={cx('list')}>
               <div className={cx('title')}>Sort by</div>
-              <div className={cx('items')}>
-                <div className={cx('item')}>Recents</div>
-                <div className={cx('item')}>Recently Added</div>
-                <div className={cx('item')}>Alphabetical</div>
-                <div className={cx('item')}>Creator</div>
+              <div className={cx('list-items')}>
+                {['Recents', 'Recently Added', 'Alphabetical', 'Creator'].map((item) => (
+                  <div
+                    className={cx('list-item', { selected: item === sort })}
+                    key={item}
+                    onClick={() => setSort(item)}
+                  >
+                    {item}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -91,7 +130,16 @@ export default function Library({ isCollapse, isEnlarge, collapse, enlarge }: Li
       </div>
       <div className={cx('list')}>
         {list.map((item: any, index: number) => {
-          return <LibraryItem item={item} enlarge={enlarge} index={index} key={index} />;
+          return (
+            <LibraryItem
+              item={item}
+              enlarge={enlarge}
+              index={index}
+              showContextMenu={showContextMenu}
+              isContextOpen={ctxMenu === index}
+              key={index}
+            />
+          );
         })}
       </div>
     </div>

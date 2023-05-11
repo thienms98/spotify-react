@@ -5,8 +5,20 @@
   position: fixed;
   top: 0;
   left: 0;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
 
   &.enlarge{
     width: 500px;
+  }
+
+  .box{
+    background-color: #121212;
+    border-radius: .5rem;
+  }
+  .box:nth-child(2){
+    flex: 1
   }
 }

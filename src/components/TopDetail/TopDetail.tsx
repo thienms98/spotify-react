@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { linkFromURI } from 'src/utils';
 
@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/redux/store';
 import { setURI } from 'src/redux/reducers/queue';
 import { playStateChange } from 'src/redux/reducers/player';
-import { addItem } from 'src/redux/reducers/library';
+import { addItem, removeItem } from 'src/redux/reducers/library';
 
 //icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -29,13 +29,23 @@ function toTimeString(millisecond: number) {
 export default function TopDetail({ data, type }: { data: any; type: string }) {
   const playingUri = useSelector((state: RootState) => state.queue).uri;
   const { playState } = useSelector((state: RootState) => state.player);
+  const lib = useSelector((state: RootState) => state.library);
   const dispatch = useDispatch();
 
+  // destructure data
   if (data) var { name, description, owner, tracks, uri } = data;
   let cover: any, totalTime;
 
   const [showOptions, setShowOptions] = useState<boolean>(false);
 
+  // checking if this in library
+  const isFav = useMemo<number>(() => {
+    return lib.list.findIndex((item) => item.uri === uri);
+  }, [lib, uri]);
+  console.log(isFav);
+
+  // spotify uri like: <a href='spotify:type:id'>name</a> x3 and more
+  // convert to [{uri, name}x3]
   function changeSpotifyUriToLocalLink(string: string) {
     let str = string.replace(/<a href=/g, '');
     str = str.replace(/<\/a>/g, '');
@@ -82,6 +92,9 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
 
   const addToLibrary = () => {
     dispatch(addItem({ uri, name, coverArt: cover, creator: owner, tracks, type }));
+  };
+  const removeFromLibrary = () => {
+    if (isFav !== -1) dispatch(removeItem(isFav));
   };
 
   return (
@@ -135,8 +148,10 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
             </div>
           </div>
           <div className={cx('btn', 'fav')}>
-            <div className={cx('icon')}>
-              {' '}
+            <div
+              className={cx('icon', { fav: isFav !== -1 })}
+              onClick={isFav === -1 ? addToLibrary : removeFromLibrary}
+            >
               <FontAwesomeIcon icon={faHeart} />
             </div>
           </div>
@@ -153,8 +168,8 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
             {showOptions && (
               <div className={cx('options')}>
                 <div className={cx('option')}>Add to queue</div>
-                <div className={cx('option')} onClick={addToLibrary}>
-                  Add to Your Library
+                <div className={cx('option')} onClick={isFav === -1 ? addToLibrary : removeFromLibrary}>
+                  {isFav === -1 ? 'Add to Your Library' : 'Remove from Your Library'}
                 </div>
               </div>
             )}
