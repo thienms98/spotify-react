@@ -49,6 +49,10 @@
 }
 .description{
   color: hsla(0,0%,100%,.7);
+
+  &>a:not(:last-child)::after{
+    content: ', ';
+  }
 }
 .detail{
   display: flex;

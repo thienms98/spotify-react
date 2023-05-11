@@ -1,0 +1,43 @@
+.wrapper{
+  &.collapse .head{
+    &>*:not(.lib){
+      display: none;
+    }
+
+    .lib>span{
+      display: none;
+    }
+  }
+}
+
+.head{
+  display: flex;
+  flex-direction: row;
+  
+  .lib{
+    flex: 1;
+    color: #999;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    &:hover{
+      color: #fff;
+    }
+  }
+
+  .icon{
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    &:hover{
+      background-color: rgba(255,255,255,0.2);
+    }
+  }
+}

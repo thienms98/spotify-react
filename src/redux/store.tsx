@@ -3,12 +3,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import playlistReducer from './reducers/playlist';
 import queueReducer from './reducers/queue';
 import playerReducer from './reducers/player';
+import libraryReducer from './reducers/library';
 
 export const store = configureStore({
   reducer: {
     playlist: playlistReducer,
     queue: queueReducer,
     player: playerReducer,
+    library: libraryReducer,
   },
 });
 

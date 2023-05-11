@@ -7,7 +7,6 @@ const cx = classNames.bind(styles);
 
 export default function Navigate() {
   // const history = window.history;
-  // console.log(history);
 
   return (
     <div className={cx('wrapper')}>

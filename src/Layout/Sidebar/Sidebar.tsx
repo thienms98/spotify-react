@@ -1,4 +1,8 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+
+import { Library } from 'src/components/Library';
+
 import { SpotifyLogo } from 'src/assets/images';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
@@ -8,8 +12,11 @@ import styles from './Sidebar.module.scss';
 const cx = classNames.bind(styles);
 
 export default function Sidebar() {
+  const [isCollapse, setIsCollapse] = useState<boolean>(false);
+  const [isEnlarge, setIsEnlarge] = useState<boolean>(false);
+
   return (
-    <div className={cx('wrapper')}>
+    <div className={cx('wrapper', { enlarge: isEnlarge })}>
       <Link to={'/'}>
         <SpotifyLogo />
       </Link>
@@ -18,6 +25,12 @@ export default function Sidebar() {
         <FontAwesomeIcon icon={faMagnifyingGlass} />
         Search
       </Link>
+      <Library
+        isCollapse={isCollapse}
+        isEnlarge={isEnlarge}
+        collapse={() => setIsCollapse((prev) => !prev)}
+        enlarge={() => setIsEnlarge((prev) => !prev)}
+      />
     </div>
   );
 }

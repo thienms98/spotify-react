@@ -1,0 +1,11 @@
+.list-item{
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.context-menu{
+  position: absolute;
+  top: 0;
+  left: 0;
+}

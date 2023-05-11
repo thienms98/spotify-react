@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/redux/store';
 import { setURI } from 'src/redux/reducers/queue';
 import { playStateChange } from 'src/redux/reducers/player';
+import { addItem } from 'src/redux/reducers/library';
 
 //icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -29,27 +30,45 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
   const playingUri = useSelector((state: RootState) => state.queue).uri;
   const { playState } = useSelector((state: RootState) => state.player);
   const dispatch = useDispatch();
+
   if (data) var { name, description, owner, tracks, uri } = data;
+  let cover: any, totalTime;
 
   const [showOptions, setShowOptions] = useState<boolean>(false);
 
-  let cover, totalTime;
-  console.log(type);
+  function changeSpotifyUriToLocalLink(string: string) {
+    let str = string.replace(/<a href=/g, '');
+    str = str.replace(/<\/a>/g, '');
+    str = str.replace(/and more/g, '');
+    str = str.replace(/>/g, ', ');
+    let list = str.split(', ');
+
+    let result: Array<any> = [];
+    list.forEach((element, index) => {
+      if (index % 2 !== 0) {
+        result.push({
+          uri: list[index - 1],
+          name: element,
+        });
+      }
+    });
+
+    return result;
+  }
 
   // config data
   if (data)
     switch (type) {
       case 'playlist':
         cover = data.images?.at(0);
-        totalTime = tracks.items.reduce(
-          (prev: number, current: { track: { duration_ms: number } }) => prev + current.track.duration_ms,
+        totalTime = tracks.items?.reduce(
+          (prev: number, current: { track: { duration_ms: number } }) => prev + current.track?.duration_ms,
           0,
         );
         break;
 
       case 'album':
         cover = data.images?.at(0);
-        console.log(tracks.items);
         owner = { uri: data.artists[0].uri, display_name: data.artists[0].name };
         totalTime = tracks.items.reduce(
           (prev: number, current: { duration_ms: number }) => prev + current.duration_ms,
@@ -60,6 +79,10 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
       default:
         break;
     }
+
+  const addToLibrary = () => {
+    dispatch(addItem({ uri, name, coverArt: cover, creator: owner, tracks, type }));
+  };
 
   return (
     data && (
@@ -77,7 +100,17 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
             {type.slice(1)}
           </div>
           <div className={cx('name')}>{name}</div>
-          <div className={cx('description')}>{description}</div>
+          <div className={cx('description')}>
+            {type === 'playlist' && (
+              <>
+                {changeSpotifyUriToLocalLink(description).map(({ uri, name }) => (
+                  <Link to={linkFromURI(uri)}>{name}</Link>
+                ))}{' '}
+                and more
+              </>
+            )}
+            {type === 'album' && description}
+          </div>
           <div className={cx('detail')}>
             <div className={cx('owner')}>
               <div className={cx('image')}>
@@ -120,7 +153,9 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
             {showOptions && (
               <div className={cx('options')}>
                 <div className={cx('option')}>Add to queue</div>
-                <div className={cx('option')}>Add to Your Library</div>
+                <div className={cx('option')} onClick={addToLibrary}>
+                  Add to Your Library
+                </div>
               </div>
             )}
           </div>

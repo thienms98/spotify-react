@@ -79,8 +79,6 @@ export default function Card({ data }: { data: any }) {
 
       break;
   }
-  console.log('data: ', data);
-  console.log('cardData: ', cardData);
 
   return (
     <div className={cx('wrapper')}>

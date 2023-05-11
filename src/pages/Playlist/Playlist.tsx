@@ -24,11 +24,9 @@ export default function Playlist() {
     getPlaylistTracks(playlistId).then((playlistTracks) => setTracks(playlistTracks));
   }, [playlistId]);
 
-  console.log(tracks, detail);
-
   return (
     <div className={cx('wrapper')}>
-      <TopDetail type="playlist" data={detail} />
+      {detail && <TopDetail type="playlist" data={detail} />}
 
       <div className={cx('header')}>
         <div className={cx('item', 'index')}>#</div>
@@ -41,7 +39,7 @@ export default function Playlist() {
       </div>
       {tracks &&
         tracks.items.map((item: any, index: number) => {
-          const { uri, artists, name, duration_ms, album, explicit } = item.track;
+          if (item.track) var { uri, artists, name, duration_ms, album, explicit } = item.track;
 
           const data = {
             uri,
@@ -49,7 +47,7 @@ export default function Playlist() {
             artists: artists?.map((artist: any) => ({ ...artist, profile: { name: artist.name } })),
             name,
             duration: { totalMilliseconds: duration_ms },
-            image: album.images[0],
+            image: album?.images[0],
             album,
           };
           return <Track index={index + 1} data={data} playHandle={() => {}} />;

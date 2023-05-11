@@ -39,7 +39,6 @@ function App() {
         fetch(`${baseUrl}/albums/?ids=${id}`, options)
           .then((res) => res.json())
           .then((res) => {
-            console.log(res);
             dispatch(
               setPlaylist(
                 res.albums[0].tracks.items.map((item: {}) => {
@@ -68,7 +67,6 @@ function App() {
         fetch(`${baseUrl}/artist_overview/?id=${id}`, options)
           .then((res) => res.json())
           .then((res) => {
-            console.log(res);
             dispatch(
               setPlaylist(
                 res.data.artist.discography.topTracks.items.map((item: any) => {

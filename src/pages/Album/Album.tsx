@@ -26,8 +26,6 @@ export default function Album() {
 
   const album = data.albums[0];
 
-  // console.log(tracks, detail);
-
   return (
     <div className={cx('wrapper')}>
       <TopDetail type="album" data={album} />
