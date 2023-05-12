@@ -91,7 +91,18 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
     }
 
   const addToLibrary = () => {
-    dispatch(addItem({ uri, name, coverArt: cover, creator: owner, tracks, type }));
+    let item: any;
+    switch (type) {
+      case 'playlist':
+        item = { uri, name, coverArt: cover, creator: owner, tracks, type };
+        break;
+      case 'album':
+        item = { uri, name, coverArt: cover, creator: { ...owner, name: owner.display_name }, tracks, type };
+        break;
+      default:
+        break;
+    }
+    dispatch(addItem(item));
   };
   const removeFromLibrary = () => {
     if (isFav !== -1) dispatch(removeItem(isFav));

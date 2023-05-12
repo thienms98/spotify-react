@@ -1,4 +1,4 @@
-import { useState, useRef, RefObject, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from 'src/redux/store';
 
@@ -27,32 +27,48 @@ interface LibraryProps {
 }
 
 export default function Library({ isCollapse, isEnlarge, collapse, enlarge }: LibraryProps) {
-  const { list } = useSelector((state: RootState) => state.library);
-  const [ctxMenu, setCtxMenu] = useState(-1);
-  const [sort, setSort] = useState('Recents');
+  let { list } = useSelector((state: RootState) => state.library);
+  const [libraryItems, setLibraryItems] = useState<Array<any>>([]);
+  const [ctxMenu, setCtxMenu] = useState<number>(-1);
+  const [sort, setSort] = useState<string>('Recents');
+  const [searchString, setSearchString] = useState<string>('');
   const searchRef = useRef<HTMLInputElement | null>(null);
 
   const showContextMenu = (index: number) => {
     setCtxMenu(index);
   };
 
-  // useEffect(() => {
-  //   switch (sort) {
-  //     case 'Recents':
-  //       break;
-  //     case 'Recently Added':
-  //       list.sort((a: any, b: any) => a.createdTime - b.createdTime);
-  //       break;
-  //     case 'Alphabetical':
-  //       list.sort((a: any, b: any) => a.name - b.name);
-  //       break;
-  //     case 'Creator':
-  //       list.sort((a: any, b: any) => a.creator.name - b.creator.name);
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }, [sort]);
+  // update items onchange
+  useEffect(() => {
+    setLibraryItems(list);
+  }, [list]);
+
+  // set list order by sort option
+  useEffect(() => {
+    switch (sort) {
+      case 'Recents':
+        break;
+      case 'Recently Added':
+        setLibraryItems((ls: any) => ls.sort((a: any, b: any) => a.createdTime - b.createdTime));
+        break;
+      case 'Alphabetical':
+        setLibraryItems((ls: any) => ls.sort((a: any, b: any) => a.name - b.name));
+        break;
+      case 'Creator':
+        setLibraryItems((ls: any) => ls.sort((a: any, b: any) => a.creator.name - b.creator.name));
+        break;
+      default:
+        break;
+    }
+  }, [sort]);
+
+  // show item match search text
+  useEffect(() => {
+    const searchlist = [...list].filter((item: any, index: number) => {
+      return item.name?.includes(searchString) || item.creator.name?.includes(searchString);
+    });
+    setLibraryItems(searchlist);
+  }, [list, searchString]);
 
   return (
     <div className={cx('wrapper', { collapse: isCollapse })}>
@@ -105,7 +121,13 @@ export default function Library({ isCollapse, isEnlarge, collapse, enlarge }: Li
               <FontAwesomeIcon icon={faMagnifyingGlass} />
             </button>
             <div className={cx('input')}>
-              <input type="text" ref={searchRef} placeholder="Search In Your Library" />
+              <input
+                type="text"
+                ref={searchRef}
+                placeholder="Search In Your Library"
+                value={searchString}
+                onChange={(e) => setSearchString(e.target.value)}
+              />
             </div>
           </div>
 
@@ -129,18 +151,19 @@ export default function Library({ isCollapse, isEnlarge, collapse, enlarge }: Li
         </div>
       </div>
       <div className={cx('list')}>
-        {list.map((item: any, index: number) => {
-          return (
-            <LibraryItem
-              item={item}
-              enlarge={enlarge}
-              index={index}
-              showContextMenu={showContextMenu}
-              isContextOpen={ctxMenu === index}
-              key={index}
-            />
-          );
-        })}
+        {libraryItems.length &&
+          libraryItems.map((item: any, index: number) => {
+            return (
+              <LibraryItem
+                item={item}
+                enlarge={enlarge}
+                index={index}
+                showContextMenu={showContextMenu}
+                isContextOpen={ctxMenu === index}
+                key={index}
+              />
+            );
+          })}
       </div>
     </div>
   );
