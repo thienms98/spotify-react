@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { linkFromURI } from 'src/utils';
 
@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'src/redux/store';
 import { setURI } from 'src/redux/reducers/queue';
 import { playStateChange } from 'src/redux/reducers/player';
-import { addItem, removeItem } from 'src/redux/reducers/library';
+import { addItem, removeItem, addTrackToFavorite, removeTrackFromFavorite } from 'src/redux/reducers/library';
 
 //icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -27,22 +27,34 @@ function toTimeString(millisecond: number) {
 }
 
 export default function TopDetail({ data, type }: { data: any; type: string }) {
+  const dispatch = useDispatch();
   const playingUri = useSelector((state: RootState) => state.queue).uri;
   const { playState } = useSelector((state: RootState) => state.player);
   const lib = useSelector((state: RootState) => state.library);
-  const dispatch = useDispatch();
+  const optionsRef = useRef<HTMLDivElement>(null);
 
+  console.log(data);
   // destructure data
   if (data) var { name, description, owner, tracks, uri } = data;
   let cover: any, totalTime;
 
+  // close options menu when click outside
   const [showOptions, setShowOptions] = useState<boolean>(false);
+  useEffect(() => {
+    const clickHandle = (e: any) => {
+      if (optionsRef.current && !optionsRef.current.contains(e.target)) {
+        setShowOptions(false);
+      }
+    };
+    document.body.addEventListener('click', clickHandle);
+    return () => document.body.removeEventListener('click', clickHandle);
+  }, []);
 
   // checking if this in library
   const isFav = useMemo<number>(() => {
+    if (type === 'track') return lib.list[0].tracks.findIndex((track) => track.uri === data.uri);
     return lib.list.findIndex((item) => item.uri === uri);
-  }, [lib, uri]);
-  console.log(isFav);
+  }, [lib, uri, type]);
 
   // spotify uri like: <a href='spotify:type:id'>name</a> x3 and more
   // convert to [{uri, name}x3]
@@ -86,11 +98,22 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
         );
         break;
 
+      case 'track':
+        console.log(data);
+        cover = data.album.images[0];
+        var { album, duration_ms, explicit, artists } = data;
+        owner = { uri: artists[0].uri, display_name: artists[0].name };
+        break;
+
       default:
         break;
     }
 
   const addToLibrary = () => {
+    if (type === 'track') {
+      dispatch(addTrackToFavorite(data));
+      return;
+    }
     let item: any;
     switch (type) {
       case 'playlist':
@@ -105,31 +128,26 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
     dispatch(addItem(item));
   };
   const removeFromLibrary = () => {
-    if (isFav !== -1) dispatch(removeItem(isFav));
+    if (type === 'track') dispatch(removeTrackFromFavorite(data.uri));
+    dispatch(removeItem(isFav));
   };
 
   return (
     data && (
       <div className={cx('wrapper')}>
-        {
-          /* close options popup, prevent interact with others when options popup shown */
-          showOptions && <div className={cx('overlay')} onClick={() => setShowOptions(false)}></div>
-        }
         <div className={cx('cover')}>
-          <img src={cover?.url} alt={name} />
+          <img src={cover && cover.url} alt={name} />
         </div>
         <div className={cx('body')}>
-          <div className={cx('type')}>
-            {type[0].toUpperCase()}
-            {type.slice(1)}
-          </div>
+          <div className={cx('type')}>{type === 'track' ? 'Song' : type[0].toUpperCase() + type.slice(1)}</div>
           <div className={cx('name')}>{name}</div>
           <div className={cx('description')}>
             {type === 'playlist' && (
               <>
-                {changeSpotifyUriToLocalLink(description).map(({ uri, name }) => (
-                  <Link to={linkFromURI(uri)}>{name}</Link>
-                ))}{' '}
+                {description &&
+                  changeSpotifyUriToLocalLink(description).map(({ uri, name }) => (
+                    <Link to={linkFromURI(uri)}>{name}</Link>
+                  ))}{' '}
                 and more
               </>
             )}
@@ -142,8 +160,17 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
               </div>
               <Link to={linkFromURI(owner.uri)}>{owner.display_name}</Link>
             </div>
-            <div className={cx('tracks-count')}>{tracks.items.length} songs</div>
-            <div className={cx('length')}>about {toTimeString(totalTime)}</div>
+            <div className={cx('tracks-count')}>
+              {type === 'track' ? (
+                <>
+                  <Link to={linkFromURI(album.uri)}>{album.name}</Link>
+                  <span>{new Date(album.release_date).getFullYear()}</span>
+                </>
+              ) : (
+                tracks.items.length + ' songs'
+              )}
+            </div>
+            <div className={cx('length')}>{type === 'track' ? duration_ms : 'about ' + toTimeString(totalTime)}</div>
           </div>
         </div>
         <div className={cx('buttons')}>
@@ -166,7 +193,7 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
               <FontAwesomeIcon icon={faHeart} />
             </div>
           </div>
-          <div className={cx('btn', 'opt')}>
+          <div className={cx('btn', 'opt')} ref={optionsRef}>
             <div
               className={cx('icon')}
               onClick={() => {
@@ -179,7 +206,14 @@ export default function TopDetail({ data, type }: { data: any; type: string }) {
             {showOptions && (
               <div className={cx('options')}>
                 <div className={cx('option')}>Add to queue</div>
-                <div className={cx('option')} onClick={isFav === -1 ? addToLibrary : removeFromLibrary}>
+                <div
+                  className={cx('option')}
+                  onClick={() => {
+                    if (isFav === -1) addToLibrary();
+                    else removeFromLibrary();
+                    setShowOptions(false);
+                  }}
+                >
                   {isFav === -1 ? 'Add to Your Library' : 'Remove from Your Library'}
                 </div>
               </div>

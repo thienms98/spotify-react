@@ -14,12 +14,6 @@ import classNames from 'classnames/bind';
 import styles from './Player.module.scss';
 const cx = classNames.bind(styles);
 
-declare global {
-  interface Window {
-    onSpotifyIframeApiReady: any;
-  }
-}
-
 export default function Player() {
   const album = {
     album_group: 'album',
@@ -476,23 +470,8 @@ export default function Player() {
     if (audioRef.current) audioRef.current.currentTime = time;
   };
 
-  // useEffect(() => {
-  //   window.onSpotifyIframeApiReady = (IFrameAPI: any) => {
-  //     const element = document.getElementById('embed-iframe');
-  //     const options = {
-  //       width: 300,
-  //       height: 100,
-  //       uri: 'spotify:album:38DiN8raykLZKEr5T6v5hM',
-  //     };
-  //     const callback = (EmbedController: any) => {};
-  //     IFrameAPI.createController(element, options, callback);
-  //   };
-  // }, []);
-
   return (
     <div className={cx('wrapper')}>
-      {/* <div id="embed-iframe"></div> */}
-
       <audio
         src={queue.list[queue.currentIndex]?.preview_url}
         ref={audioRef}

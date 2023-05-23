@@ -42,30 +42,48 @@ const initialState: { list: Array<Library> } = JSON.parse(localStorage.getItem('
   ],
 };
 
+function save(library: { list: Library[] }) {
+  localStorage.setItem('library', JSON.stringify(library));
+}
+
 export const librarySlice = createSlice({
   name: 'library',
   initialState,
   reducers: {
-    // createItem: (state, action: PayloadAction<any>) => {
-    //   state.list.push()
-    // },
+    // add item by data <Object> push to last position
     addItem: (state, action: PayloadAction<any>) => {
       const insertItem = { ...action.payload, pinned: false, createdTime: new Date() };
       state.list.push(insertItem);
-      localStorage.setItem('library', JSON.stringify(state));
+      save(state);
     },
+    // remove item by index
     removeItem: (state, action: PayloadAction<number>) => {
+      if (action.payload === 0) return;
       let deletedList = [...state.list];
       deletedList.splice(action.payload, 1);
       state.list = deletedList;
-      localStorage.setItem('library', JSON.stringify(state));
+      save(state);
     },
+    // pin / unpin by index
     switchPinItem: (state, action: PayloadAction<number>) => {
       state.list[action.payload].pinned = !state.list[action.payload].pinned;
-      localStorage.setItem('library', JSON.stringify(state));
+      save(state);
+    },
+    // add track to favorite playlist with data <Object>
+    addTrackToFavorite: (state, action: PayloadAction<any>) => {
+      const favList = state.list.find((list) => list.type === 'liked');
+      if (!favList) return;
+      favList.tracks.push(action.payload);
+      save(state);
+    },
+    // remove track from favorite by uri
+    removeTrackFromFavorite: (state, action: PayloadAction<string>) => {
+      const position = state.list[0].tracks.findIndex((track) => track.uri === action.payload);
+      if (position > -1) state.list[0].tracks.splice(position, 1);
+      save(state);
     },
   },
 });
 
-export const { addItem, removeItem, switchPinItem } = librarySlice.actions;
+export const { addItem, removeItem, switchPinItem, addTrackToFavorite, removeTrackFromFavorite } = librarySlice.actions;
 export default librarySlice.reducer;

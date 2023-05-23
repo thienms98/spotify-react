@@ -1,8 +1,15 @@
-import { useDispatch } from 'react-redux';
-import { createQueueBySingle, setURI } from 'src/redux/reducers/queue';
+import { useState, useRef, useEffect, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+
+import { RootState } from 'src/redux/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { createQueueBySingle, setURI } from 'src/redux/reducers/queue';
+import { addItem, removeItem } from 'src/redux/reducers/library';
+
+import { Options, OptionsItem } from 'src/components/Options';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
+
 import linkFromURI from 'src/utils/linkFromURI';
 
 import classNames from 'classnames/bind';
@@ -18,9 +25,14 @@ interface CardData {
   artists: string[] | null;
 }
 
-export default function Card({ data }: { data: any }) {
+function Card({ data }: { data: any }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { list } = useSelector((state: RootState) => state.library);
+  const idxLib = list.findIndex((item) => item.uri === data.uri);
+
+  const [ctxMenu, setCtxMenu] = useState<Array<any>>([false, 0, 0]);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const type = data.uri.split(':')[1];
   const cardData: CardData = {
@@ -80,8 +92,50 @@ export default function Card({ data }: { data: any }) {
       break;
   }
 
+  // clear context menu when click outside
+  useEffect(() => {
+    const removeCtxMn = (e: any) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setCtxMenu([false, 0, 0]);
+      }
+    };
+    document.body.addEventListener('click', removeCtxMn);
+    document.body.addEventListener('contextmenu', removeCtxMn);
+    return () => {
+      document.body.removeEventListener('click', removeCtxMn);
+      document.body.removeEventListener('contextmenu', removeCtxMn);
+    };
+  }, []);
+
+  // config data to add into lib
+  const addToLibrary = () => {
+    if (type !== 'album' && type !== 'playlist') return;
+    let item: any;
+    switch (type) {
+      case 'playlist':
+        item = { ...data, coverArt: cardData.image, creator: data.owner, type };
+        break;
+      case 'album':
+        item = { ...data, coverArt: cardData.image, creator: { ...data.owner, name: data.owner.display_name }, type };
+        break;
+      default:
+        break;
+    }
+    dispatch(addItem(item));
+    setCtxMenu([false, 0, 0]);
+  };
+
   return (
-    <div className={cx('wrapper')}>
+    <div
+      className={cx('wrapper')}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        if (wrapperRef.current)
+          // calculate mouse position from top, left when click
+          setCtxMenu([true, wrapperRef.current.offsetTop - e.pageY, wrapperRef.current.offsetLeft - e.pageX]);
+      }}
+      ref={wrapperRef}
+    >
       <div className={cx('head')}>
         <div
           className={cx('image', { rounded: cardData.uri.split(':')[1] === 'artist' })}
@@ -116,6 +170,24 @@ export default function Card({ data }: { data: any }) {
             })}
         </div>
       </div>
+
+      {ctxMenu[0] && (
+        <Options style={{ top: -ctxMenu[1], left: -ctxMenu[2] }}>
+          <OptionsItem>Add to Queue</OptionsItem>
+          {idxLib === -1 ? (
+            <OptionsItem onClick={() => addToLibrary()}>Add to Library</OptionsItem>
+          ) : (
+            <OptionsItem
+              onClick={() => {
+                dispatch(removeItem(idxLib));
+                setCtxMenu([false, 0, 0]);
+              }}
+            >
+              Remove to Library
+            </OptionsItem>
+          )}
+        </Options>
+      )}
     </div>
   );
 }
@@ -128,3 +200,5 @@ Card.defaultProps = {
   text: '',
   artists: null,
 };
+
+export default memo(Card);

@@ -1,6 +1,10 @@
-import { useSelector } from 'react-redux';
-import { RootState } from 'src/redux/store';
 import { Link } from 'react-router-dom';
+
+import { useSelector, useDispatch } from 'react-redux';
+import { addTrackToFavorite, removeTrackFromFavorite } from 'src/redux/reducers/library';
+import { RootState } from 'src/redux/store';
+
+import { Options, OptionsItem } from 'src/components/Options';
 
 import { linkFromURI, timeFormater } from 'src/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -32,8 +36,12 @@ export default function Track({
   data: TrackData;
   playHandle: Function;
 }) {
+  const dispatch = useDispatch();
   const queue = useSelector((state: RootState) => state.queue);
+  const lib = useSelector((state: RootState) => state.library);
   const { playState } = useSelector((state: RootState) => state.player);
+
+  const isFav = [...lib.list][0].tracks.findIndex((item: any) => item.uri === data.uri);
 
   return (
     data && (
@@ -81,8 +89,13 @@ export default function Track({
           {data.album && <Link to={linkFromURI(data.album.uri)}>{data.album.name}</Link>}
         </div>
         <div className={cx('more')}>
-          <div className={cx('fav')}>
-            <div className={cx('icon')}>
+          <div className={cx('fav', { faved: isFav > -1 })}>
+            <div
+              className={cx('icon')}
+              onClick={() =>
+                isFav === -1 ? dispatch(addTrackToFavorite(data)) : dispatch(removeTrackFromFavorite(data.uri))
+              }
+            >
               <FontAwesomeIcon icon={faHeart} />
             </div>
           </div>
@@ -93,6 +106,11 @@ export default function Track({
             </div>
           </div>
         </div>
+
+        <Options>
+          <OptionsItem>Add to queue</OptionsItem>
+          <OptionsItem>Add to library</OptionsItem>
+        </Options>
       </div>
     )
   );

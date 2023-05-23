@@ -118,7 +118,7 @@ export const data = [
     },
     name: 'Daily Mix 5',
     owner: {
-      display_name: 'Spotify',
+      name: 'Spotify',
       id: 'spotify',
       uri: 'spotify:user:spotify',
     },
@@ -142,7 +142,7 @@ export const data = [
     },
     name: 'Daily Mix 2',
     owner: {
-      display_name: 'Spotify',
+      name: 'Spotify',
       id: 'spotify',
       uri: 'spotify:user:spotify',
     },

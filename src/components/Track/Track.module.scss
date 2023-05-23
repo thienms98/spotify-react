@@ -95,10 +95,15 @@
 
   .fav{
     margin-right: 1em;
+
+    
   }
   .icon{
     cursor: pointer;
     opacity: 0;
   }
-  
+  .faved .icon{
+    color: #1ed760;
+    opacity: 1;
+  }
 }

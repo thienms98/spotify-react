@@ -6,7 +6,7 @@ import { setPlaylist } from 'src/redux/reducers/queue';
 import { Routes, Route } from 'react-router-dom';
 import { Sidebar, Topbar, NowPlaying } from 'src/Layout';
 import { Search } from 'src/components/Search';
-import { Homepage, Searchpage, Queue, Track, Playlist, Album } from './pages';
+import { Homepage, Searchpage, Queue, Artist, Track, Playlist, Album } from './pages';
 
 import 'normalize.css';
 import 'src/App.css';
@@ -32,6 +32,12 @@ function App() {
   const queue = useSelector((state: RootState) => state.queue);
   const dispatch = useDispatch();
   const [, type, id] = useMemo(() => queue.uri.split(':'), [queue.uri]);
+
+  useEffect(() => {
+    const removeContextMenu = (e: any) => e.preventDefault();
+    document.body.addEventListener('contextmenu', removeContextMenu);
+    return () => document.body.removeEventListener('contextmenu', removeContextMenu);
+  }, []);
 
   useEffect(() => {
     switch (type) {
@@ -101,6 +107,7 @@ function App() {
           <Route path="/search/:query" element={<Searchpage />}></Route>
           <Route path="/queue" element={<Queue />}></Route>
           <Route path="/track/:trackId" element={<Track />}></Route>
+          <Route path="/artist/:artistId" element={<Artist />}></Route>
           <Route path="/playlist/:playlistId" element={<Playlist />}></Route>
           <Route path="/album/:albumId" element={<Album />}></Route>
         </Routes>
